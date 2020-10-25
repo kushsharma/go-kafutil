@@ -1,0 +1,4 @@
+host: localhost:9092
+topic: kafutil-default-k1
+descriptor_set_path: ./protos/desc.set
+schema: kafutil.internal.KafutilSample
