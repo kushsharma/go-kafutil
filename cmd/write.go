@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/kushsharma/go-kafutil/config"
 	"github.com/segmentio/kafka-go"
 	"github.com/spf13/cobra"
@@ -39,20 +41,36 @@ func initWriter(conf config.App) *cobra.Command {
 				log.Fatal("Unable to assert into MessageDescriptor")
 			}
 
+			// use this to push oob date for BQ testing
+			// evtTsProto, _ := ptypes.TimestampProto(time.Date(9999, 11, 11, 24, 24, 24, 24, time.UTC))
+			// eventTimestampValue := evtTsProto.ProtoReflect()
+
+			// default ts
+			eventTimestampValue := ptypes.TimestampNow().ProtoReflect()
+			_ = eventTimestampValue
+
 			sampleReplaceMessage := dynamicpb.NewMessage(sampleReplaceDescriptorMessage)
 			sampleReplaceMessage.Set(sampleReplaceDescriptorMessage.Fields().ByName("hakai"), protoreflect.ValueOfString("beeru"))
 			sampleReplaceMessage.Set(sampleReplaceDescriptorMessage.Fields().ByName("rasengan"), protoreflect.ValueOfString("naru"))
 			sampleReplaceMessage.Set(sampleReplaceDescriptorMessage.Fields().ByName("over"), protoreflect.ValueOfInt64(int64(rand.Intn(10000))))
+			sampleReplaceMessage.Set(sampleReplaceDescriptorMessage.Fields().ByName("event_timestamp"), protoreflect.ValueOfMessage(eventTimestampValue))
+
+			// to cause invalidProtocolBufferException
+			// sampleReplaceMessage.Set(sampleReplaceDescriptorMessage.Fields().ByName("event_timestamp"), protoreflect.ValueOfString("invalid-timestamp"))
+
 			messageInBytes, err := proto.Marshal(sampleReplaceMessage)
 			if err != nil {
 				panic(err)
 			}
 
+			fmt.Printf("writing message to topic %s, encoding with proto %s...\n", conf.Topic, conf.Schema)
+
+			// to test null message value
 			// if err := writeMessageToKafka(conf, []byte("key-3"), nil); err != nil {
 			// 	panic(err)
 			// }
 
-			if err := writeMessageToKafka(conf, []byte("key-2"), messageInBytes); err != nil {
+			if err := writeMessageToKafka(conf, []byte(fmt.Sprintf("key-%d", int64(rand.Intn(1000)))), messageInBytes); err != nil {
 				panic(err)
 			}
 
@@ -88,6 +106,8 @@ func writeMessageToKafka(conf config.App, key, msg []byte) error {
 	return nil
 }
 
+// writeDummyToKafka - DEPRECATE
+// sample function that demonstrate writing to kafka
 func writeDummyToKafka() error {
 
 	// make a writer that produces to topic-A, using the least-bytes distribution

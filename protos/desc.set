@@ -5,11 +5,11 @@
 seconds (Rseconds
 nanos (RnanosB~
 com.google.protobufBTimestampProtoPZ+github.com/golang/protobuf/ptypes/timestampø¢GPBªGoogle.Protobuf.WellKnownTypesbproto3
-¿
-protos/app.protokafutil.internalgoogle/protobuf/timestamp.proto"š
+¬
+protos/app.protoprotosgoogle/protobuf/timestamp.proto"š
 KafutilSample
 hakai (	Rhakai
 rasengan (	Rrasengan
 over (RoverC
-event_timestamp (2.google.protobuf.TimestampReventTimestampBS
-com.kafutil.internalBKafutilPZ0github.com/kushsharma/go-kafutil/protos/internalbproto3
+event_timestamp (2.google.protobuf.TimestampReventTimestampBJ
+com.kafutil.internalBKafutilPZ'github.com/kushsharma/go-kafutil/protosbproto3

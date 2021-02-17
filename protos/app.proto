@@ -1,18 +1,34 @@
 syntax = "proto3";
 
-package kafutil.internal;
+package protos;
 
 option java_multiple_files = true;
 option java_package = "com.kafutil.internal";
 option java_outer_classname = "Kafutil";
-option go_package = "github.com/kushsharma/go-kafutil/protos/internal";
+option go_package = "github.com/kushsharma/go-kafutil/protos";
 
 import "google/protobuf/timestamp.proto";
 
-// sample proto
+// sample proto - default proto
 message KafutilSample {
 	string hakai = 1; // power of destruction
 	string rasengan = 2; // spinning ball of chakra
 	int64 over = 3; // power level
 	google.protobuf.Timestamp event_timestamp = 4; // Table metadata that represents when the record is loaded into the table
 }
+
+// sample proto - bad index 2
+// message KafutilSample {
+// 	string hakai = 1; // power of destruction
+// 	int64 rasengan = 2; // spinning ball of chakra
+// 	int64 over = 3; // power level
+// 	google.protobuf.Timestamp event_timestamp = 4; // Table metadata that represents when the record is loaded into the table
+// }
+
+// sample proto - bad index 4
+// message KafutilSample {
+// 	string hakai = 1; // power of destruction
+// 	string rasengan = 2; // spinning ball of chakra
+// 	int64 over = 3; // power level
+// 	string event_timestamp = 4; // Table metadata that represents when the record is loaded into the table
+// }

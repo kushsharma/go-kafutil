@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 
@@ -34,6 +35,7 @@ func initReader(conf config.App) *cobra.Command {
 			if err != nil {
 				panic(err)
 			}
+			fmt.Printf("reading messages from topic %s, decoding with proto %s...\n", conf.Topic, conf.Schema)
 			if err := readMessageFromKafka(descriptorFiles, conf); err != nil {
 				panic(err)
 			}
@@ -43,6 +45,7 @@ func initReader(conf config.App) *cobra.Command {
 	return thisCmd
 }
 
+// decodeMessageValue deserialize message using descriptor
 func decodeMessageValue(desc protoreflect.Descriptor, raw []byte) string {
 
 	sampleReplaceDescriptorMessage, ok := desc.(protoreflect.MessageDescriptor)
@@ -52,6 +55,7 @@ func decodeMessageValue(desc protoreflect.Descriptor, raw []byte) string {
 
 	sampleReplaceMessage := dynamicpb.NewMessage(sampleReplaceDescriptorMessage)
 	if err := proto.Unmarshal(raw, sampleReplaceMessage); err != nil {
+		log.Fatal("failed to parse error")
 		panic(err)
 	}
 
@@ -72,12 +76,16 @@ func readMessageFromKafka(files *protoregistry.Files, conf config.App) error {
 		MinBytes:  10e3, // 10KB
 		MaxBytes:  10e6, // 10MB
 	})
+	// to set offset
 	//r.SetOffset(42)
 
 	for {
 		m, err := r.ReadMessage(context.Background())
 		if err != nil {
-			break
+			if err == io.EOF {
+				break
+			}
+			log.Fatal(err)
 		}
 		fmt.Printf("message at offset %d: %s = %s\n", m.Offset, string(m.Key), decodeMessageValue(sampleReplaceDescriptor, m.Value))
 	}
@@ -89,6 +97,8 @@ func readMessageFromKafka(files *protoregistry.Files, conf config.App) error {
 	return nil
 }
 
+// readDummyFromKafka - DEPRECATE
+// sample function that demonstrate reading from kafka
 func readDummyFromKafka() error {
 	// make a new reader that consumes from topic-A, partition 0, at offset 42
 	r := kafka.NewReader(kafka.ReaderConfig{

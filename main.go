@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/kushsharma/go-kafutil/cmd"
 	"github.com/kushsharma/go-kafutil/config"
@@ -35,10 +37,12 @@ func main() {
 }
 
 func initConfig() {
+	rand.Seed(time.Now().UnixNano())
+
 	viper.SetDefault("host", "localhost:9092")
 	viper.SetDefault("topic", "kafutil-default")
 	viper.SetDefault("descriptor_set_path", "./protos/desc.set")
-	viper.SetDefault("schema", "kafutil.internal.KafutilSample")
+	viper.SetDefault("schema", "protos.KafutilSample")
 
 	viper.SetEnvPrefix("KAFUTIL")
 	viper.SetConfigName(".kafutil")
